@@ -1,4 +1,7 @@
 import { Scenes, Markup } from "telegraf";
+import validatePhoneNumber from "../validation/phone.validation";
+import getProvider from "../helpers/getProvider";
+import amountValidation from "../validation/amount.validation";
 
 const phoneRechargeScene = new Scenes.WizardScene<any>('PHONE_RECHARGE_SCENE',
     //step 1 : request phone number
@@ -14,8 +17,14 @@ const phoneRechargeScene = new Scenes.WizardScene<any>('PHONE_RECHARGE_SCENE',
             return;
         }
         const phoneNumber = ctx.message.text.trim();
-        ///----phone number validation (function not created yet)---///
-        ///----we also need to set the plane code to the session---///
+        //phone number validation
+        if(!validatePhoneNumber(phoneNumber)){
+            await ctx.reply("Invalid phone number");
+            return;
+        }
+        //get provider
+        const provider = getProvider(phoneNumber);
+        ctx.scene.state.data.provider = provider;
         ctx.scene.state.data.phoneNumber = phoneNumber;
         await ctx.reply("Enter the amount to recharge.");
         return ctx.wizard.next()
@@ -23,9 +32,13 @@ const phoneRechargeScene = new Scenes.WizardScene<any>('PHONE_RECHARGE_SCENE',
     //step3 : get and verify the amount
     async  (ctx) => {
         const amount = ctx.message.text;
-        ///----amount validation (function not created yet)---///
+        //amount validation
+        if(!amountValidation(amount)){
+            await ctx.reply("Invalid amount entred");
+            return;
+        }
         ctx.scene.state.data.amount = amount;
-        await ctx.reply(`Recharge amount: ${amount} to ${ctx.scene.state.data.phoneNumber},confirm?`,
+        await ctx.reply(`Recharge amount: ${amount}\nPhone number: ${ctx.scene.state.data.phoneNumber}\nProvider: ${ctx.scene.state.data.provider}\nDo you want to confirme?`,
             Markup.inlineKeyboard([
                 Markup.button.callback('Yes', 'CONFIRM_RECHARGE'),
                 Markup.button.callback('No','CANCEL_RECHARGE'),
