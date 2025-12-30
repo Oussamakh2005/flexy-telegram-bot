@@ -1,7 +1,8 @@
 import { Scenes, Markup } from "telegraf";
 import validatePhoneNumber from "../validation/phone.validation";
-import getProvider from "../helpers/getProvider";
+import getPlan from "../helpers/getPlan";
 import amountValidation from "../validation/amount.validation";
+import plans from "../resources/plans";
 
 const phoneRechargeScene = new Scenes.WizardScene<any>('PHONE_RECHARGE_SCENE',
     //step 1 : request phone number
@@ -23,22 +24,23 @@ const phoneRechargeScene = new Scenes.WizardScene<any>('PHONE_RECHARGE_SCENE',
             return;
         }
         //get provider
-        const provider = getProvider(phoneNumber);
-        ctx.scene.state.data.provider = provider;
+        const plan = getPlan(phoneNumber);
+        ctx.scene.state.data.plan = plan;
         ctx.scene.state.data.phoneNumber = phoneNumber;
-        await ctx.reply("Enter the amount to recharge.");
+        await ctx.reply(`Enter the amount to recharge.\nOperator: ${plans[plan]?.operator}\nmin: ${plans[plan]?.min_amount}DZD\nmax: ${plans[plan]?.max_amount}DZD`);
         return ctx.wizard.next()
     },
     //step3 : get and verify the amount
     async  (ctx) => {
         const amount = ctx.message.text;
+        const plan = plans[ctx.scene.state.data.plan];
         //amount validation
-        if(!amountValidation(amount)){
+        if(!amountValidation(amount,plan?.min_amount as number,plan?.max_amount as number)){
             await ctx.reply("Invalid amount entred");
             return;
         }
         ctx.scene.state.data.amount = amount;
-        await ctx.reply(`Recharge amount: ${amount}\nPhone number: ${ctx.scene.state.data.phoneNumber}\nProvider: ${ctx.scene.state.data.provider}\nDo you want to confirme?`,
+        await ctx.reply(`Recharge amount: ${amount}\nPhone number: ${ctx.scene.state.data.phoneNumber}DZD\nOperator: ${plan?.operator}\nDo you want to confirme?`,
             Markup.inlineKeyboard([
                 Markup.button.callback('Yes', 'CONFIRM_RECHARGE'),
                 Markup.button.callback('No','CANCEL_RECHARGE'),
