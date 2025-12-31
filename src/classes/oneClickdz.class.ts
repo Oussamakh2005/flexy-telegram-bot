@@ -23,17 +23,17 @@ class OneClickDz {
     // send top up request
     async sendTopUp(planCode: string, phoneNumber: string, amount: number) {
         const ref = `${new Date().toUTCString}-${uuidV4()}`;
-        this.httpClient.post('mobile/send', {
-            "plan_code": planCode,
-            "MSSIDN": phoneNumber,
-            "amount": amount,
-            "ref": ref,
-        }).then((response) => {
-            const data = response.data;
-            return data.data;
-        }).catch((error) => {
+        try {
+            const response = await this.httpClient.post('mobile/send', {
+                "plan_code": planCode,
+                "MSSIDN": phoneNumber,
+                "amount": amount,
+                "ref": ref,
+            });
+            return response.data;
+        } catch (err) {
             return;
-        });
+        }
         /* const success = {
              "success": true,
              "data": {
@@ -81,16 +81,16 @@ class OneClickDz {
                 };
             } else if (data.status === "UNKNOWN_ERROR") {
                 return {
-                    success : false,
-                    msg : "Something went wrong , contact the support",
+                    success: false,
+                    msg: "Something went wrong , contact the support",
                 }
-            }else {
+            } else {
                 await sleep(5000);
             }
         }
     }
 
-    async checkBalance(){
+    async checkBalance() {
         try {
             const response = await this.httpClient.get(`account/balance`);
             return response.data.balance;
