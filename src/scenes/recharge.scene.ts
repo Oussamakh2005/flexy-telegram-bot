@@ -25,8 +25,10 @@ const phoneRechargeScene = new Scenes.WizardScene<any>('PHONE_RECHARGE_SCENE',
         }
         //get provider
         const plan = getPlan(phoneNumber);
+        //set the plan data to the scene state
         ctx.scene.state.data.plan = plan;
         ctx.scene.state.data.planCode = plans[plan]?.code;
+        ctx.scene.state.data.planCost = plans[plan]?.cost;
         ctx.scene.state.data.phoneNumber = phoneNumber;
         await ctx.reply(`Enter the amount to recharge.\nOperator: ${plans[plan]?.operator}\nmin: ${plans[plan]?.min_amount}DZD\nmax: ${plans[plan]?.max_amount}DZD`);
         return ctx.wizard.next()
@@ -41,7 +43,7 @@ const phoneRechargeScene = new Scenes.WizardScene<any>('PHONE_RECHARGE_SCENE',
             return;
         }
         ctx.scene.state.data.amount = amount;
-        await ctx.reply(`Recharge amount: ${amount}\nPhone number: ${ctx.scene.state.data.phoneNumber}\nOperator: ${plan?.operator}\nDo you want to confirme?`,
+        await ctx.reply(`Recharge amount: ${amount}DZD\nPhone number: ${ctx.scene.state.data.phoneNumber}\nOperator: ${plan?.operator}\nDo you want to confirme?`,
             Markup.inlineKeyboard([
                 Markup.button.callback('Yes', 'CONFIRM_RECHARGE'),
                 Markup.button.callback('No', 'CANCEL_RECHARGE'),
