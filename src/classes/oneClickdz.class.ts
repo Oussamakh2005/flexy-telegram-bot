@@ -22,7 +22,7 @@ class OneClickDz {
 
     // send top up request
     async sendTopUp(planCode: string, phoneNumber: string, amount: number) {
-        const ref = `${new Date().toUTCString}-${uuidV4()}`;
+        const ref = `${new Date().toISOString()}-${uuidV4()}`;
         try {
             const response = await this.httpClient.post('mobile/send', {
                 "plan_code": planCode,
@@ -30,7 +30,7 @@ class OneClickDz {
                 "amount": amount,
                 "ref": ref,
             });
-            return response.data;
+            return response.data.data;
         } catch (err) {
             return;
         }
@@ -56,7 +56,7 @@ class OneClickDz {
     async checkStatusById(id: string) {
         try {
             const response = await this.httpClient.get(`mobile/check-id/${id}`);
-            return response.data;
+            return response.data.data;
         } catch (err) {
             return;
         }
@@ -88,15 +88,25 @@ class OneClickDz {
                 await sleep(5000);
             }
         }
+        return {
+            success : false,
+            msg : "Time out"
+        }
     }
 
     async checkBalance() {
         try {
             const response = await this.httpClient.get(`account/balance`);
-            return response.data.balance;
+            return response.data.data.balance;
         } catch (err) {
             return;
         }
+    }
+
+    calculatePrice(amount : number , cost : number){
+        const apiCost = (amount * cost);
+        const finalCost = apiCost + (1 * 0.05);
+        return finalCost;
     }
 }
 

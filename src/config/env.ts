@@ -6,5 +6,5 @@ export const API_BASE_URL = process.env.API_BASE_URL!;
 export const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN!;
 export const ADMIN_CHAT_ID = parseInt(process.env.ADMIN_CHAT_ID!);
 //environment
-const PORT = parseInt(process.env.PORT!);
-const NODE_ENV = process.env.NODE_ENV!;
+export const PORT = parseInt(process.env.PORT!);
+export const NODE_ENV = process.env.NODE_ENV!;
