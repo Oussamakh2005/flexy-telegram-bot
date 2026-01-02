@@ -1,5 +1,5 @@
 # flexy_bot
-##About
+## About
 This project is a telegram bot for mobile recharge service, which allow users to topup their mobile balance using their mobile number and a recharge amount. It uses the `oneClickDz` API to perform the recharge.
 To install dependencies:
 
