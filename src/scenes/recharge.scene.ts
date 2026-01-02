@@ -38,12 +38,23 @@ const phoneRechargeScene = new Scenes.WizardScene<any>('PHONE_RECHARGE_SCENE',
         const amount = ctx.message.text;
         const plan = plans[ctx.scene.state.data.plan];
         //amount validation
-        if (!amountValidation(amount, plan?.min_amount as number, plan?.max_amount as number)) {
+       const validatedAmount = amountValidation(amount, plan?.min_amount as number, plan?.max_amount as number)
+        if (!validatedAmount) {
             await ctx.reply("Invalid amount entred");
             return;
         }
-        ctx.scene.state.data.amount = amount;
-        await ctx.reply(`Recharge amount: ${amount}DZD\nPhone number: ${ctx.scene.state.data.phoneNumber}\nOperator: ${plan?.operator}\nDo you want to confirme?`,
+        //check balance :
+        const balance = await oneClickDzClient.checkBalance();
+        if(balance === null){
+            await ctx.reply("Something went wrong.");
+            return ctx.scene.leave();
+        }
+        if(balance as number < validatedAmount){
+            ctx.reply("You don't have enough balance to recharge this amount.");
+            return ctx.scene.leave();
+        }
+        ctx.scene.state.data.amount = validatedAmount;
+        await ctx.reply(`Recharge amount: ${validatedAmount}DZD\nPhone number: ${ctx.scene.state.data.phoneNumber}\nOperator: ${plan?.operator}\nDo you want to confirme?`,
             Markup.inlineKeyboard([
                 Markup.button.callback('Yes', 'CONFIRM_RECHARGE'),
                 Markup.button.callback('No', 'CANCEL_RECHARGE'),

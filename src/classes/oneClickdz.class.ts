@@ -99,7 +99,7 @@ class OneClickDz {
             const response = await this.httpClient.get(`account/balance`);
             return response.data.data.balance;
         } catch (err) {
-            return;
+            return null;
         }
     }
 
