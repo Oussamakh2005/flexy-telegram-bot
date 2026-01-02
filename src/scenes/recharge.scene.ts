@@ -62,6 +62,7 @@ const phoneRechargeScene = new Scenes.WizardScene<any>('PHONE_RECHARGE_SCENE',
         );
         return ctx.wizard.next();
     },
+    //step4 : confirm recharge
     async (ctx) => {
         if (ctx.callbackQuery.data === "CONFIRM_RECHARGE") {
             await ctx.answerCbQuery("you choose to confirm recharge");;
